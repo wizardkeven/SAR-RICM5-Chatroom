@@ -9,12 +9,20 @@ import messages.engine.Server;
 
 public class myServer extends Server{
 	
-	private int port;
-	private InetAddress m_localhost;
+	public int port;
+	private InetAddress server_address;
 	private ServerSocketChannel serverSocketChannel;
 	
-	public myServer(InetAddress serverIP, int port, ServerSocketChannel serverSocketChannel) throws Exception {
-		m_localhost = InetAddress.getByName("localhost");
+	public InetAddress getServer_address() {
+		return server_address;
+	}
+
+	public void setServer_address(InetAddress server_address) {
+		this.server_address = server_address;
+	}
+	
+	public myServer(InetAddress serverIP, int port, ServerSocketChannel serverSocketChannel) {
+		server_address =serverIP;
 		this.port = port;
 		this.serverSocketChannel = serverSocketChannel;
 	}

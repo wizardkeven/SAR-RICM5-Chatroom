@@ -16,7 +16,8 @@ public class Ping extends Thread {
 
   InetAddress m_localhost;
   Selector m_selector;
-  SocketChannel m_ch; //Can read and write data over the network via TCP
+  
+  SocketChannel m_ch;
   SelectionKey m_key;
   int m_port;
 

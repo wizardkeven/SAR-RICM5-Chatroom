@@ -6,9 +6,11 @@ import messages.engine.ConnectCallback;
 public class myConnectCallback implements ConnectCallback {
 
 	
-	static myChannel c_MyChannel= null;
+	myChannel c_MyChannel= null;
+	public int ID=0;
 	public myConnectCallback(myChannel m_MyChannel) {
-		// TODO Auto-generated constructor stub
+		this.ID++;
+		this.c_MyChannel = m_MyChannel;
 	}
 
 	@Override

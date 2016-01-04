@@ -11,9 +11,11 @@ import messages.engine.DeliverCallback;
 public class myChannel extends Channel {
 
 	SocketChannel m_SocketChannel;
+	public int ID=0;
 	private static boolean Connected = false;
 
 	public myChannel(SocketChannel channel) {
+		this.ID++;
 		m_SocketChannel = channel;
 	}
 

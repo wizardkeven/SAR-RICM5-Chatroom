@@ -34,13 +34,22 @@ public class Pong extends Thread {
 
   public void run() {
     try {
-      System.out.println("<<< Pong: accepting...");
-      accept(m_port);
-      waitForAccept();
-      System.out.println("<<< Pong: accepted.");
-      
-      System.out.println("<<< Pong: receiving...");
-      receive();
+        System.out.println("<<< Pong: accepting...");
+        accept(m_port);
+//    	while (m_skey.isValid()) {
+    	      waitForAccept();
+    	      System.out.println("<<< Pong: accepted.");
+    	      
+    	      System.out.println("<<< Pong: receiving...");
+    	      receive();
+//		}
+//      System.out.println("<<< Pong: accepting...");
+//      accept(m_port);
+//      waitForAccept();
+//      System.out.println("<<< Pong: accepted.");
+//      
+//      System.out.println("<<< Pong: receiving...");
+//      receive();
       
     } catch (Exception ex) {
       System.err.println("<<< Pong: threw an exception: " + ex.getMessage());
@@ -72,10 +81,15 @@ public class Pong extends Thread {
       System.err.println("<<< Pong: ServerSocker mismatch!");
       System.exit(-1);
     }
-    m_ch = m_sch.accept();
-    m_ch.configureBlocking(false);
-    m_ch.socket().setTcpNoDelay(true);
-    m_key = m_ch.register(m_selector, SelectionKey.OP_READ);//SelectionKey.OP_WRITE
+    SocketChannel sChannel = SocketChannel.open();
+//    m_ch = m_sch.accept();
+//    m_ch.configureBlocking(false);
+//    m_ch.socket().setTcpNoDelay(true);
+//    m_key = m_ch.register(m_selector, SelectionKey.OP_READ);//SelectionKey.OP_WRITE
+    sChannel = m_sch.accept();
+    sChannel.configureBlocking(false);
+    sChannel.socket().setTcpNoDelay(true);
+    m_key = sChannel.register(m_selector, SelectionKey.OP_READ);//SelectionKey.OP_WRITE
   }
 
   void waitForAccept() throws IOException {
@@ -108,7 +122,8 @@ public class Pong extends Thread {
     
     ByteBuffer buf = ByteBuffer.allocate(32);
     int count = 0;
-    count = m_ch.read(buf);
+//    count = m_ch.read(buf);
+    count = ch.read(buf);
     if (count == -1) {
       System.err.println("<<< Pong: end of stream!");
       System.exit(-1);
