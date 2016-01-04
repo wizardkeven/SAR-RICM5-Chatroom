@@ -23,16 +23,16 @@ public abstract class Engine {
   long totalConnectCount;
   long totalWriteCount;
   long totalReadCount;
-  long acceptCount;
-  long connectCount;
-  long writeCount;
+  protected long acceptCount;
+  protected long connectCount;
+  protected long writeCount;
   long readCount;
   Thread echoThread;
   Runnable echo = new Runnable() {
     public void run() {
       while (true) {
         try {
-          Thread.sleep(1000);
+          Thread.sleep(3000);
           long now = System.currentTimeMillis();
           if (now-lastEcho>1000) {
             if (Options.VERBOSE_STATS) {

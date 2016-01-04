@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.SelectionKey;
@@ -16,15 +17,15 @@ import java.util.HashMap;
 
 import com.sun.glass.ui.TouchInputSupport;
 
-
 /**
- * This chatMain must be launched parameterized beginning with "-port=..." and "-connection=..."
- * Each parameter should be separated by a comma;
+ * This chatMain must be launched parameterized beginning with "-port=..." and
+ * "-connection=..." Each parameter should be separated by a comma;
+ * 
  * @author keven
  *
  */
 public class chatMain {
-	
+
 	private static String hostID;
 	private static final String PORT_ARG = "-port=";
 	private static final String CONNECTION_ARG = "-connection=";
@@ -44,7 +45,6 @@ public class chatMain {
 																// contains its
 																// connection
 																// type
-	private static int hostCapacity;//Host server capacity
 
 	static {
 		connectionPaire = new HashMap<Integer, conType>();
@@ -55,10 +55,10 @@ public class chatMain {
 	 */
 	static void parseArgs(String args[]) {
 		String[] portSerial;
-		for (int i = 0; i < args.length; i++){
+		for (int i = 0; i < args.length; i++) {
 			if (args[i].startsWith(HOSTID_ARG)) {
 				hostID = args[i].substring(HOSTID_ARG.length());
-			}else if (args[i].startsWith(PORT_ARG)) {
+			} else if (args[i].startsWith(PORT_ARG)) {
 				port = args[i].substring(PORT_ARG.length());
 				try {
 					// In case of multiple connections
@@ -107,141 +107,147 @@ public class chatMain {
 					System.err.print(e.toString());
 				}
 
-			}else if (args[i].startsWith(HOST_SERVER_CAPACITY)) {
+			} else if (args[i].startsWith(HOST_SERVER_CAPACITY)) {
 				String hCapacity = args[i].substring(CONNECTION_ARG.length());
-				hostCapacity = Integer.parseInt(hCapacity);
 			}
 		}
 		if (connectionPaire.isEmpty()) {
 			System.err.println("No connection parameter entering, system will exit!");
 			System.exit(-1);
 		}
-//		if (connectionPaire.values().size() != portOrder.length) {
-//			System.err.println(
-//					"Parameter error! PLease check the coherence of ports and connctionType! System will exit.");
-//			System.exit(-1);
-//		}
+		// if (connectionPaire.values().size() != portOrder.length) {
+		// System.err.println(
+		// "Parameter error! PLease check the coherence of ports and
+		// connctionType! System will exit.");
+		// System.exit(-1);
+		// }
 	}
 
 	public static void main(String[] args) throws Exception {
-		
+
 		parseArgs(args);
-		
-		InetAddress m_localhost;
-		Selector m_selector;
-		ServerSocketChannel m_sch;// Allow you to listen for incoming TCP
-									// connections, like a web server does.
-									// For each incoming connection, a
-									// SocketChannel is created
-		SelectionKey m_skey; // Can read and write date over the network via TCP
-		SocketChannel m_ch = null;
-		int m_port;
-		SocketChannel m_Channel = null;
-		
-		myConnectCallback m_MyConnectCallback = null;
-		myAcceptCallback m_MyAcceptCallback;
 
-		myChannel m_MyChannel = new myChannel(m_ch);
-//		BufferedReader br;
-//		String line;
-//		do {
-//			line = "";
-//			br = new BufferedReader(new InputStreamReader(System.in));
-//			line = br.readLine();
-//		} while (line.isEmpty() || !line.equals("connect") || !line.equals("accept")); // For
-//																						// a
-//																						// client
-//																						// who
-//																						// launches
-//																						// a
-//																						// connection
-//		// he/she should enter a "connect"; otherwise wait. Or enters a "accept"
-//		// to open a server
-//
-//		br.close();// Close buffer
+		// InetAddress m_localhost;
+		// Selector m_selector;
+		// ServerSocketChannel m_sch;// Allow you to listen for incoming TCP
+		// // connections, like a web server does.
+		// // For each incoming connection, a
+		// // SocketChannel is created
+		// SelectionKey m_skey; // Can read and write date over the network via
+		// TCP
+		// SocketChannel m_ch = null;
+		// int m_port;
+		// SocketChannel m_Channel = null;
+		//
+		// myConnectCallback m_MyConnectCallback = null;
+		// myAcceptCallback m_MyAcceptCallback;
+		//
+		// myChannel m_MyChannel = new myChannel(m_ch);
+		// BufferedReader br;
+		// String line;
+		// do {
+		// line = "";
+		// br = new BufferedReader(new InputStreamReader(System.in));
+		// line = br.readLine();
+		// } while (line.isEmpty() || !line.equals("connect") ||
+		// !line.equals("accept")); // For
+		// // a
+		// // client
+		// // who
+		// // launches
+		// // a
+		// // connection
+		// // he/she should enter a "connect"; otherwise wait. Or enters a
+		// "accept"
+		// // to open a server
+		//
+		// br.close();// Close buffer
 
-		m_localhost = InetAddress.getByName("localhost");
-//		m_selector = SelectorProvider.provider().openSelector();
-//		m_port = 12345;
+		// m_localhost = InetAddress.getByName("localhost");
+		// m_selector = SelectorProvider.provider().openSelector();
+		// m_port = 12345;
 
-		myEngine m_Engine = new myEngine(hostID);
+		myEngine m_Engine = new myEngine(hostID,connectionPaire.keySet().size());
 
 		synchronized (connectionPaire) {
 			for (int port : connectionPaire.keySet()) {
 				System.out.print(port + ": " + connectionPaire.get(port) + "\n");
 
 				if (connectionPaire.get(port).equals(conType.ACCEPT)) {
-//					Thread.sleep(200);
+					myChannel m_MyChannel = null;
+					// Thread.sleep(200);
+					// m_Engine.startServer(new InetSocketAddress(port));
 					m_Engine.listen(port, new myAcceptCallback(m_MyChannel));
 				} else if (connectionPaire.get(port).equals(conType.CONNECT)) {
-//					Thread.sleep(100);
-					m_MyConnectCallback = new myConnectCallback(m_MyChannel);
-					m_Engine.connect(m_localhost, port, m_MyConnectCallback);
+					// Thread.sleep(100);
+					// m_MyConnectCallback = new myConnectCallback(m_MyChannel);
+					// m_Engine.connect(m_localhost, port, m_MyConnectCallback);
+					m_Engine.connectToServer(new InetSocketAddress(port));
 				}
 
 			}
 		}
 		m_Engine.mainloop();// Main thread running always
 
-
-//		Runnable echo = new Runnable() {
-//
-//			private BufferedReader bufferedReader;
-//
-//			public void run() {
-//
-//				synchronized (this) {
-//					while (!m_MyChannel.isConnected()) {
-//						try {
-//							m_MyChannel.wait();
-//						} catch (InterruptedException e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						}
-//					}
-//				}
-//
-//				System.out.println(">>> Ping got writing room...");
-//
-//				String info = "I am Guo Kai, say hello to you!";
-//				for (;;) {
-//					handleInput(info);
-//					info = "";
-//					bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-//					try {
-//						info = bufferedReader.readLine();
-//					} catch (IOException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//					if (info.equals("Quit") || info.equals("quit")) {
-//						try {
-//							m_MyChannel.close();
-//						} catch (Exception e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						}
-//						System.exit(0);
-//						System.out.println(">>> Ping sent bytes.");
-//					}
-//				}
-//			}
-//
-//			private ByteBuffer byteBuffer;
-//			private Charset charset = Charset.forName("UTF-8");;
-//
-//			/**
-//			 * @param info
-//			 */
-//			protected void handleInput(String info) {
-//				CharBuffer charBuffer = CharBuffer.wrap(info + "\n");
-//				System.out.println("Info from Ping: " + info);
-//				byteBuffer = charset.encode(charBuffer);
-//				byteBuffer.compact();
-//				byteBuffer.flip();
-//				m_MyChannel.send(byteBuffer);
-//			}
-//		};
+		// Runnable echo = new Runnable() {
+		//
+		// private BufferedReader bufferedReader;
+		//
+		// public void run() {
+		//
+		// synchronized (this) {
+		// while (!m_MyChannel.isConnected()) {
+		// try {
+		// m_MyChannel.wait();
+		// } catch (InterruptedException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+		// }
+		// }
+		//
+		// System.out.println(">>> Ping got writing room...");
+		//
+		// String info = "I am Guo Kai, say hello to you!";
+		// for (;;) {
+		// handleInput(info);
+		// info = "";
+		// bufferedReader = new BufferedReader(new
+		// InputStreamReader(System.in));
+		// try {
+		// info = bufferedReader.readLine();
+		// } catch (IOException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+		// if (info.equals("Quit") || info.equals("quit")) {
+		// try {
+		// m_MyChannel.close();
+		// } catch (Exception e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+		// System.exit(0);
+		// System.out.println(">>> Ping sent bytes.");
+		// }
+		// }
+		// }
+		//
+		// private ByteBuffer byteBuffer;
+		// private Charset charset = Charset.forName("UTF-8");;
+		//
+		// /**
+		// * @param info
+		// */
+		// protected void handleInput(String info) {
+		// CharBuffer charBuffer = CharBuffer.wrap(info + "\n");
+		// System.out.println("Info from Ping: " + info);
+		// byteBuffer = charset.encode(charBuffer);
+		// byteBuffer.compact();
+		// byteBuffer.flip();
+		// m_MyChannel.send(byteBuffer);
+		// }
+		// };
 
 	}
 
