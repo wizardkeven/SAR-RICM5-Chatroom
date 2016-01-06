@@ -128,7 +128,7 @@ public class chatMain {
 		parseArgs(args);
 
 		// InetAddress m_localhost;
-		// Selector m_selector;
+		 Selector m_selector = null;
 		// ServerSocketChannel m_sch;// Allow you to listen for incoming TCP
 		// // connections, like a web server does.
 		// // For each incoming connection, a
@@ -166,28 +166,44 @@ public class chatMain {
 		// m_localhost = InetAddress.getByName("localhost");
 		// m_selector = SelectorProvider.provider().openSelector();
 		// m_port = 12345;
-
-		myEngine m_Engine = new myEngine(hostID,connectionPaire.keySet().size());
-
-		synchronized (connectionPaire) {
-			for (int port : connectionPaire.keySet()) {
-				System.out.print(port + ": " + connectionPaire.get(port) + "\n");
-
-				if (connectionPaire.get(port).equals(conType.ACCEPT)) {
-					myChannel m_MyChannel = null;
-					// Thread.sleep(200);
-					// m_Engine.startServer(new InetSocketAddress(port));
-					m_Engine.listen(port, new myAcceptCallback(m_MyChannel));
-				} else if (connectionPaire.get(port).equals(conType.CONNECT)) {
-					// Thread.sleep(100);
-					// m_MyConnectCallback = new myConnectCallback(m_MyChannel);
-					// m_Engine.connect(m_localhost, port, m_MyConnectCallback);
-					m_Engine.connectToServer(new InetSocketAddress(port));
+//
+//		myEngine m_Engine = new myEngine(hostID,connectionPaire.keySet().size());
+//
+//		synchronized (connectionPaire) {
+//			for (int port : connectionPaire.keySet()) {
+//				System.out.print(port + ": " + connectionPaire.get(port) + "\n");
+//
+//				if (connectionPaire.get(port).equals(conType.ACCEPT)) {
+//					myChannel m_MyChannel = null;
+//					// Thread.sleep(200);
+//					// m_Engine.startServer(new InetSocketAddress(port));
+//					m_Engine.listen(port, new myAcceptCallback(m_MyChannel));
+//				} else if (connectionPaire.get(port).equals(conType.CONNECT)) {
+//					// Thread.sleep(100);
+//					// m_MyConnectCallback = new myConnectCallback(m_MyChannel);
+//					// m_Engine.connect(m_localhost, port, m_MyConnectCallback);
+//					m_Engine.connectToServer(new InetSocketAddress(port));
+//				}
+//
+//			}
+//		}
+//		m_Engine.mainloop();// Main thread running always
+		 
+		 synchronized (connectionPaire) {
+				for (int port : connectionPaire.keySet()) {
+					System.out.print(port + ": " + connectionPaire.get(port) + "\n");
+	
+					if (connectionPaire.get(port).equals(conType.ACCEPT)) {
+						Thread server = new Thread(new myServer(hostID,new InetSocketAddress(port), m_selector));
+						server.start();
+					} else if (connectionPaire.get(port).equals(conType.CONNECT)) {
+						Thread client = new Thread(new myClient(hostID, new InetSocketAddress(port)));
+						client.start();
+					}
+	
 				}
-
 			}
-		}
-		m_Engine.mainloop();// Main thread running always
+
 
 		// Runnable echo = new Runnable() {
 		//

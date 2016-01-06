@@ -12,7 +12,9 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
-import java.nio.channels.spi.SelectorProvider;
+import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,21 +23,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.xml.crypto.Data;
-
-import com.sun.swing.internal.plaf.synth.resources.synth;
-
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
-
 import messages.engine.AcceptCallback;
 import messages.engine.Channel;
 import messages.engine.ConnectCallback;
-import messages.engine.DeliverCallback;
 import messages.engine.Engine;
 import messages.engine.Server;
-import sun.net.NetworkClient;
 
 public class myEngine extends Engine {
 
@@ -545,7 +537,7 @@ public class myEngine extends Engine {
 		this.server.bind(new InetSocketAddress(port));
 
 		this.m_key = this.m_sch.register(this.m_selector, SelectionKey.OP_ACCEPT);
-		return new myServer(new InetSocketAddress(port), this.m_selector);
+		return new myServer(hostName, new InetSocketAddress(port), this.m_selector);
 		// return null;
 	}
 
@@ -597,7 +589,7 @@ public class myEngine extends Engine {
 		// // request to connect to the server
 		// tempSocketChannel.connect(requsetedServerAddress);
 		// socketChannelsList.put(tempSocketChannel, port);
-		Thread client = new Thread(new myClient(hostName, requsetedServerAddress, readySocketChannel));
+		Thread client = new Thread(new myClient(hostName, requsetedServerAddress));
 		client.start();
 	}
 
@@ -663,7 +655,7 @@ public class myEngine extends Engine {
 
 	}
 
-	synchronized private void handleRead(SelectionKey key) throws IOException {
+	private void handleRead(SelectionKey key) throws IOException {
 		synchronized (key) {
 			SocketChannel ch = (SocketChannel) key.channel();
 			ByteBuffer buf = ByteBuffer.allocate(1024);
@@ -691,7 +683,7 @@ public class myEngine extends Engine {
 				if (displayInfo[2].equalsIgnoreCase("quit")) {
 					ch.close();
 					// System.exit(0);
-					System.out.println(ch.toString() + ">>> closes.");
+					System.out.println(ch.toString() + ">>> closes.");		
 				}
 				// this.info = hostName+" received message from "+
 				// displayInfo[1];
@@ -720,7 +712,7 @@ public class myEngine extends Engine {
 	 */
 	public void startServer(InetSocketAddress inetSocketAddress) {
 		// TODO Auto-generated method stub
-		Thread server = new Thread(new myServer(inetSocketAddress, this.m_selector));
+		Thread server = new Thread(new myServer(info, inetSocketAddress, this.m_selector));
 		server.start();
 	}
 
