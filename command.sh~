@@ -1,7 +1,8 @@
 #!/bin/bash
 echo "Start to execute java"
 
-javac  -cp ./SAR-RICM5-Chatroom/src/messages/engine/*.java ./SAR-RICM5-Chatroom/src/myMsgLevel/*.java
+javac  -cp ./SAR-RICM5-Chatroom/src/messages/engine/*.java 
+javac  -cp ./SAR-RICM5-Chatroom/src/myMsgLevel/*.java
 cd ./SAR-RICM5-Chatroom/bin
 pwd
 #The following commands should be executed sequentielly one by each time in independant terminal
